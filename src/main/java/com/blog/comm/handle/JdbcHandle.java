@@ -22,8 +22,8 @@ import org.springframework.stereotype.Repository;
 
 import com.alibaba.fastjson.JSON;
 import com.blog.comm.annotation.Column;
-import com.blog.comm.annotation.Table;
 import com.blog.comm.base.BaseLogger;
+import com.blog.comm.base.BaseModel;
 import com.blog.comm.entity.BeanEntity;
 import com.blog.comm.entity.Pager;
 import com.blog.comm.entity.SQLEntity;
@@ -87,6 +87,7 @@ public class JdbcHandle {
 			}
 			KeyHolder keyHolder = new GeneratedKeyHolder();
 			Integer code = jdbcTemplate.update(new PreparedStatementCreator() {
+				@Override
 				public PreparedStatement createPreparedStatement(Connection con)
 						throws SQLException {
 					PreparedStatement ps = con.prepareStatement(sql,
@@ -130,7 +131,7 @@ public class JdbcHandle {
 	 *            参数map容器
 	 * @return 结果集
 	 */
-	public List<Map<String, Object>> doQuery(String sql, Object... paras) {
+	public List<Map<String, Object>> query(String sql, Object... paras) {
 		return baseQuery(sql, paras);
 	}
 
@@ -140,57 +141,18 @@ public class JdbcHandle {
 	 * @param sql
 	 * @return
 	 */
-	public List<Map<String, Object>> doQuery(String sql) {
+	public List<Map<String, Object>> query(String sql) {
 		return baseQuery(sql, null);
 	}
 
-	/**
-	 * 执行SQL语句,返回对象
-	 * 
-	 * @param sql
-	 * @return
-	 */
-	public <T> List<T> doQueryBean(Class<?> clazz,String sql,Object ... paras) {
-		List<Map<String, Object>>  recs= doQuery(sql, paras);
-		if(StringUtil.isNullOrEmpty(recs)){
-			return null;
-		}
-		return JdbcUtil.parseBeans(clazz, recs);
-	}
-	/**
-	 * 执行SQL语句,返回对象
-	 * 
-	 * @param sql
-	 * @return
-	 */
-	public <T> T doQueryBeanFirst(Class<?> clazz,String sql) {
-		List<Map<String, Object>>  recs= baseQuery(sql, null);
-		if(StringUtil.isNullOrEmpty(recs)){
-			return null;
-		}
-		return JdbcUtil.parseBean(clazz, recs.get(0));
-	}
-	/**
-	 * 执行SQL语句,返回对象
-	 * 
-	 * @param sql
-	 * @return
-	 */
-	public <T> T doQueryBeanFirst(Class<?> clazz,String sql,Object... paras) {
-		Map<String, Object>  rec= doQueryFirst(sql, paras);
-		if(StringUtil.isNullOrEmpty(rec)){
-			return null;
-		}
-		return JdbcUtil.parseBean(clazz, rec);
-	}
 	/**
 	 * 执行SQL语句
 	 * 
 	 * @param sql
 	 * @return
 	 */
-	public Map<String, Object> doQueryFirst(String sql, Object... paras) {
-		List<Map<String, Object>> list = doQuery(sql, paras);
+	public Map<String, Object> queryFirst(String sql, Object... paras) {
+		List<Map<String, Object>> list = query(sql, paras);
 		if (StringUtil.isNullOrEmpty(list)) {
 			return null;
 		}
@@ -203,8 +165,8 @@ public class JdbcHandle {
 	 * @param sql
 	 * @return
 	 */
-	public Map<String, Object> doQueryFirst(String sql) {
-		return doQueryFirst(sql, new Object[] {});
+	public Map<String, Object> queryFirst(String sql) {
+		return queryFirst(sql, new Object[] {});
 	}
 
 	/**
@@ -214,35 +176,54 @@ public class JdbcHandle {
 	 * @param paras 参数列表
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> T doQueryAuto(Class<?> clazz,String sql, Object... paras) {
-		List<Map<String, Object>> records = doQuery(sql, paras);
+	public <T> T queryFirstAuto(Class<?> clazz,String sql, Object... paras) {
+		List<T> list=queryAuto(clazz, sql, paras);
+		if(StringUtil.isNullOrEmpty(list)){
+			return null;
+		}
+		return list.get(0);
+	}
+	/**
+	 * 执行SQL语句获得任意类型结果
+	 * @param clazz 返回类型
+	 * @param sql sql语句
+	 * @param paras 参数列表
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
+	public <T> List<T> queryAuto(Class<?> clazz,String sql, Object... paras) {
+		List<Map<String, Object>> records = query(sql, paras);
 		if (StringUtil.isNullOrEmpty(records)) {
-			return (T) PropertUtil.parseValue(-1, clazz);
+			return null;
 		}
 		Map<String, Object> rec = records.get(0);
-		for (String key : rec.keySet()) {
-			try {
-				if (StringUtil.isNullOrEmpty(rec.get(key))) {
-					continue;
+		if(BaseModel.class.isAssignableFrom(clazz)){
+			List<T> list=new ArrayList<T>();
+			for(Map<String, Object> line:records){
+				T t= PropertUtil.mapToModel(rec, clazz);
+				if(!StringUtil.isNullOrEmpty(t)){
+					list.add(t);
 				}
-				Object value=PropertUtil.parseValue(rec.get(key), clazz);
-				return (T) value;
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			return list;
 		}
-		sql = formatSql(sql);
-		if (sql.contains("select count(") || sql.contains("select sum(")
-				|| sql.contains("select avg(")) {
-			return (T) PropertUtil.parseValue(0, clazz);
+		sql=formatSql(sql);
+		List list=new ArrayList();
+		for(Map<String, Object> line:records){
+			Object value= PropertUtil.parseValue(new ArrayList<Object>(line.values()).get(0), clazz);
+			if(StringUtil.isNullOrEmpty(value)){
+				if (sql.contains("select count(") || sql.contains("select sum(")|| sql.contains("select avg(")) {
+					list.add(PropertUtil.parseValue(0, clazz));
+				}
+				continue;
+			}
+			list.add(value);
 		}
-		return (T) PropertUtil.parseValue(-1, clazz);
+		return list;
 	}
-
 	
-	public List<?> doQueryField(Class<?> fieldType, String sql,Object... paras) {
-		List<Map<String, Object>> recs= doQuery(sql, paras);
+	public List<?> queryField(Class<?> fieldType, String sql,Object... paras) {
+		List<Map<String, Object>> recs= query(sql, paras);
 		if(StringUtil.isNullOrEmpty(recs)){
 			return null;
 		}
@@ -681,7 +662,7 @@ public class JdbcHandle {
 	 */
 	public Integer getCount(String sql, Object...params) {
 		sql = parsCountSql(sql);
-		Integer count = doQueryAuto(Integer.class,sql, params);
+		Integer count = queryFirstAuto(Integer.class,sql, params);
 		return count;
 	}
 
@@ -692,8 +673,7 @@ public class JdbcHandle {
 	 * @return
 	 */
 	public Integer getCount(String sql) {
-		Object [] paras=null;
-		return getCount(sql, paras);
+		return getCount(sql, new Object[]{});
 	}
 
 	
@@ -728,8 +708,7 @@ public class JdbcHandle {
 	 * @return
 	 */
 	public Integer doUpdate(String sql) {
-		Object [] paras=null;
-		return baseUpdate(sql, paras);
+		return baseUpdate(sql, new Object[]{});
 	}
 
 
@@ -757,7 +736,7 @@ public class JdbcHandle {
 				return -1;
 			}
 			// 获取表名
-			String tableName = JdbcUtil.unParsParaName(getModelName(obj));
+			String tableName = JdbcUtil.getTableName(obj);
 			// 获取属性列表
 			List<BeanEntity> prpres = PropertUtil.getBeanFields(obj);
 			if (prpres == null || prpres.isEmpty()) {
@@ -822,42 +801,6 @@ public class JdbcHandle {
 	 */
 
 	/**
-	 * 删除功能区 -start
-	 */
-	/**
-	 * 根据对象条件进行删除
-	 * 
-	 * @param cla
-	 * @param priKeyName
-	 * @param priKeyValue
-	 * @return
-	 */
-	public Integer delete(Class<?> cla, String priKeyName, Object priKeyValue) {
-		if (StringUtil.findEmptyIndex(cla, priKeyName, priKeyValue) > -1) {
-			return -1;
-		}
-		// 获取表名
-		String tableName = JdbcUtil.unParsParaName(getModelName(cla));
-		StringBuilder sb = new StringBuilder();
-		sb.append("delete ").append(" from ").append(tableName)
-				.append(" where ").append(priKeyName).append("=? ");
-		Map<Integer, Object> paraMap = new TreeMap<Integer, Object>();
-		paraMap.put(1, priKeyValue);
-		return baseUpdate(sb.toString(), paraMap);
-	}
-
-	/**
-	 * 根据对象条件进行删除
-	 * 
-	 * @param cla
-	 * @param priKeyValue
-	 * @return
-	 */
-	public Integer delete(Class<?> cla, Object priKeyValue) {
-		return delete(cla, "id", priKeyValue);
-	}
-
-	/**
 	 * 更新功能区 -end
 	 */
 
@@ -876,7 +819,7 @@ public class JdbcHandle {
 				return -1;
 			}
 			// 获取表名
-			String tableName = JdbcUtil.unParsParaName(getModelName(obj));
+			String tableName =JdbcUtil.getTableName(obj);
 			// 获取属性列表
 			List<BeanEntity> prpres = PropertUtil.getBeanFields(obj);
 			if (prpres == null || prpres.isEmpty()) {
@@ -918,21 +861,6 @@ public class JdbcHandle {
 	}
 
 	/**
-	 * 根据对象条件进行插入或更新
-	 * 
-	 * @param obj
-	 * @param priKeyName
-	 * @return
-	 */
-	public Integer saveOrUpdate(Object obj, String... priKeyName) {
-		Object priKeyvalue = PropertUtil.getFieldValue(obj, priKeyName[0]);
-		if (StringUtil.isNullOrEmpty(priKeyvalue)) {
-			return insert(obj);
-		}
-		return update(obj, priKeyName);
-	}
-
-	/**
 	 * 根据对象进行插入或更新
 	 * 
 	 * @param obj
@@ -940,6 +868,15 @@ public class JdbcHandle {
 	 * @return
 	 */
 	public Integer saveOrUpdateAuto(Object obj) {
+		return saveOrUpdateAuto(obj, new String[]{});
+	}
+	/**
+	 * 保存或更新
+	 * @param obj 欲保存的对象
+	 * @param addFields 当数据存在时累加的字段
+	 * @return
+	 */
+	public Integer saveOrUpdateAuto(Object obj,String...addFields) {
 		if (obj == null) {
 			return -1;
 		}
@@ -948,23 +885,29 @@ public class JdbcHandle {
 		// 拼接SQL语句
 		StringBuilder sql = new StringBuilder(MessageFormat.format(
 				"insert into {0} set ", tableName));
-		List<Object> params=new ArrayList<Object>();
-		String diySql=parseFieldSql(obj,params);
+		List<Object> paras=new ArrayList<Object>();
+		String diySql=parseFieldSql(obj,paras);
 		if(StringUtil.isNullOrEmpty(diySql)){
 			return -1;
 		}
 		sql.append(diySql);
 		sql.append(" ON DUPLICATE KEY UPDATE ");
-		diySql=parseFieldSql(obj,params);
+		diySql=parseFieldSql(obj,paras,addFields);
 		sql.append(diySql);
-		return baseUpdate(sql.toString(),params.toArray());
+		return baseUpdate(sql.toString(),paras);
 	}
-
-	public String parseFieldSql(Object obj,List<Object> params){
+	private String parseFieldSql(Object obj,List<Object> params,String...addFields){
 		List<BeanEntity> prpres = PropertUtil.getBeanFields(obj);
 		StringBuilder sql = new StringBuilder();
 		BeanEntity vo = null;
 		String fieldName = null;
+		List<String> addFieldList=null;
+		if(!StringUtil.isNullOrEmpty(addFields)){
+			addFieldList=Arrays.asList(addFields);
+		}
+		if(StringUtil.isNullOrEmpty(addFieldList)){
+			addFieldList=new ArrayList<String>();
+		}
 		for (int i = 0; i < prpres.size(); i++) {
 			vo = prpres.get(i);
 			if (vo != null) {
@@ -975,7 +918,11 @@ public class JdbcHandle {
 				if (vo.getFieldValue() == null) {
 					continue;
 				}
-				sql.append(fieldName).append("=?");
+				if(addFieldList.contains(fieldName)||addFieldList.contains(vo.getFieldName())){
+					sql.append(fieldName).append("=").append(fieldName).append("+").append("?");
+				}else{
+					sql.append(fieldName).append("=?");
+				}
 				// 封装参数
 				params.add(vo.getFieldValue());
 				if (i < prpres.size() - 1) {
@@ -988,6 +935,10 @@ public class JdbcHandle {
 					sql.toString().length() - 1));
 		}
 		return sql.toString();
+	}
+
+	private String parseFieldSql(Object obj,List<Object> params){
+		return parseFieldSql(obj, params, new String[]{});
 	}
 	/**
 	 * 插入功能区 -end
@@ -1003,37 +954,6 @@ public class JdbcHandle {
 		return obj.getClass();
 	}
 
-	private static String getModelName(Object obj) {
-		try {
-			Class<?> cla = obj.getClass();
-			if (obj instanceof Class) {
-				cla = (Class<?>) obj;
-			}
-			Table table = (Table) cla.getAnnotation(Table.class);
-			if (!StringUtil.isNullOrEmpty(table)) {
-				if (!StringUtil.isNullOrEmpty(table.value())) {
-					return table.value();
-				}
-			}
-			return getModelNameByClass(cla);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private static String getModelNameByClass(Class<?> cla) {
-		try {
-			String classNmae = cla.getName();
-			String packageName = cla.getPackage().getName();
-			String modelName = classNmae.replace(packageName, "")
-					.replace(".", "").replace("\\.", "");
-			return modelName;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
 	private String parsCountSql(String sql) {
 		while (sql.indexOf("  ") > -1) {
@@ -1072,11 +992,4 @@ public class JdbcHandle {
 		return sql.toLowerCase();
 	}
 
-
-	public static void main(String[] args) {
-		String sql = "select * from admin ,";
-		if (sql.endsWith(",")) {
-			System.out.println(sql.substring(0, sql.length() - 1));
-		}
-	}
 }

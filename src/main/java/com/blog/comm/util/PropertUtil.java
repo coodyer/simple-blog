@@ -54,7 +54,30 @@ public class PropertUtil {
 		}
 		return values;
 	}
-
+	/**
+	 * Map转对象
+	 */
+	@SuppressWarnings("rawtypes")
+	public static <T> T mapToModel(Map map,Class<?> clazz){
+		if(StringUtil.isNullOrEmpty(map)){
+			return null;
+		}
+		try {
+			Object value=clazz.newInstance();
+			List<BeanEntity> entitys=getBeanFields(clazz);
+			if(StringUtil.isNullOrEmpty(entitys)){
+				return null;
+			}
+			for(BeanEntity entity:entitys){
+				try {
+					entity.getSourceField().set(value, parseValue(entity.getFieldValue(), entity.getFieldType()));
+				} catch (Exception e) {
+				}
+			}
+		} catch (Exception e) {
+		}
+		return null;
+	}
 	/**
 	 * 获取方法参数列表
 	 * 
