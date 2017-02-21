@@ -5,10 +5,10 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+  <meta name="description" content="${setting.description }">
+  <meta name="keywords" content="${setting.keywords }">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>BLOG index with sidebar & slider  | Amaze UI Examples</title>
+  <title>${setting.siteName }</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="Cache-Control" content="no-siteapp"/>
   <link rel="icon" type="image/png" href="assets/i/favicon.png">
@@ -29,7 +29,7 @@
 <header class="am-g am-g-fixed blog-fixed blog-text-center blog-header">
     <div class="am-u-sm-8 am-u-sm-centered">
         <img width="200" src="http://s.amazeui.org/media/i/brand/amazeui-b.png" alt="Amaze UI Logo"/>
-        <h2 class="am-hide-sm-only">中国首个开源 HTML5 跨屏前端框架</h2>
+        <h2 class="am-hide-sm-only">${setting.siteName }</h2>
     </div>
 </header>
 <hr>
@@ -316,7 +316,7 @@
             </p>
         </div>
     </div>    
-    <div class="blog-text-center">© 2015 AllMobilize, Inc. Licensed under MIT license. Made with love By LWXYFER</div>    
+    <div class="blog-text-center">${setting.copyright }</div>    
   </footer>
 
 

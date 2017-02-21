@@ -35,4 +35,26 @@ public class CacheFinal {
 	 */
 	public static final String SETTING_INFO="SETTING_INFO";
 	
+	/**
+	 * 网站用户信息
+	 */
+	public static final String MEMBER_INFO="MEMBER_INFO";
+	
+	/**
+	 * 网站用户分页列表
+	 */
+	public static final String MEMBER_PAGER="MEMBER_PAGER";
+	/**
+	 * spring后缀列表
+	 */
+	public static final String SPRING_SUFFIXS="SPRING_SUFFIXS";
+	/**
+	 * spring默认后缀
+	 */
+	public static final String SPRING_DEFAULT_SUFFIXS="SPRING_DEFAULT_SUFFIXS";
+	/**
+	 * 网站静态后缀
+	 */
+	public static final String SITE_STA_SUFFIX_KEY="SITE_STA_SUFFIX_KEY";
+	
 }

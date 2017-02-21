@@ -30,6 +30,8 @@
 	</mvc:annotation-driven>
 	<!-- spring mvc配置 -->
 	<bean
+		class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" />
+	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/view/" />
 		<property name="suffix" value=".jsp" />

@@ -10,22 +10,22 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>5.0.0.M4</version>
+			<version>4.3.6.release</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>5.0.0.M4</version>
+			<version>4.3.6.release</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
-			<version>5.0.0.M4</version>
+			<version>4.3.6.release</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>5.0.0.M4</version>
+			<version>4.3.6.release</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -53,6 +53,18 @@
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>
 			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>central</id>
+			<name>mvnrepository</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
