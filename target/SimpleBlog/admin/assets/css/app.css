@@ -398,7 +398,7 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
 .container-fluid {
   margin-top: 0;
   margin-bottom: 0;
-  padding: 40px 0;
+  padding: 20px 0;
   border-bottom: 0;
   padding-left: 20px;
   padding-right: 20px;
@@ -1195,7 +1195,7 @@ ul.tpl-dropdown-content .tpl-dropdown-menu-messages-item .menu-messages-content 
   border-bottom: 1px solid #eee;
 }
 .theme-white .tpl-content-wrapper {
-  background: #e9ecf3;
+  background: #F1F1F1;
 }
 .theme-white .tpl-header-fluid {
   background: #fff;

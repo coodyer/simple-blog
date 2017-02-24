@@ -3,7 +3,7 @@
 		<header>
 			<!-- logo -->
 			<div class="am-fl tpl-header-logo">
-				<a href="javascript:;"><img src="assets/img/logo.png" alt=""></a>
+				<a href="javascript:;"><img src="${basePath }admin/assets/img/logo.png" alt=""></a>
 
 </div>
 			<!-- 右侧内容 -->
@@ -40,7 +40,7 @@
 									href="javascript:;"
 									class="tpl-dropdown-menu-messages-item am-cf">
 										<div class="menu-messages-ico">
-											<img src="assets/img/user04.png" alt="">
+											<img src="${basePath }admin/assets/img/user04.png" alt="">
 										</div>
 										<div class="menu-messages-time">3小时前</div>
 										<div class="menu-messages-content">
@@ -58,7 +58,7 @@
 									href="javascript:;"
 									class="tpl-dropdown-menu-messages-item am-cf">
 										<div class="menu-messages-ico">
-											<img src="assets/img/user02.png" alt="">
+											<img src="${basePath }admin/assets/img/user02.png" alt="">
 										</div>
 										<div class="menu-messages-time">5天前</div>
 										<div class="menu-messages-content">

@@ -11,10 +11,10 @@
 <link rel="apple-touch-icon-precomposed"
 	href="assets/i/app-icon72x72@2x.png">
 <meta name="apple-mobile-web-app-title" content="Amaze UI" />
-<script src="assets/js/echarts.min.js"></script>
-<link rel="stylesheet" href="assets/css/amazeui.min.css" />
-<link rel="stylesheet" href="assets/css/amazeui.datatables.min.css" />
-<link rel="stylesheet" href="assets/css/app.css">
-<script src="assets/js/jquery.min.js"></script>
+<script src="${basePath }admin/assets/js/echarts.min.js"></script>
+<link rel="stylesheet" href="${basePath }admin/assets/css/amazeui.min.css" />
+<link rel="stylesheet" href="${basePath }admin/assets/css/amazeui.datatables.min.css" />
+<link rel="stylesheet" href="${basePath }admin/assets/css/app.css">
+<script src="${basePath }admin/assets/js/jquery.min.js"></script>
 <title>${setting.siteName }</title>
 </head>
