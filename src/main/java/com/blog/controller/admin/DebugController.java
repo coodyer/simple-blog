@@ -40,12 +40,6 @@ import com.blog.comm.util.StringUtil;
 public class DebugController extends BaseController {
 	private static final String DIR = "admin/debug/";
 
-	@RequestMapping(value = "/admin/debug/superIndex.do")
-	@Power("superIndex")
-	public String superIndex(HttpServletRequest req, HttpServletResponse res) {
-		return DIR + "base";
-	}
-
 	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/admin/debug/fileList.do")
 	@Power("fileSetting")

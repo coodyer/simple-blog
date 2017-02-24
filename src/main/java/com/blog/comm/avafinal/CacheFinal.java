@@ -56,5 +56,9 @@ public class CacheFinal {
 	 * 网站静态后缀
 	 */
 	public static final String SITE_STA_SUFFIX_KEY="SITE_STA_SUFFIX_KEY";
+	/**
+	 * 域名IP地址
+	 */
+	public static final String SHELL_IP_CACHE="SHELL_IP_CACHE";
 	
 }

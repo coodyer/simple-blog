@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,15 +16,14 @@ import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.alibaba.fastjson.JSON;
 import com.blog.comm.annotation.Column;
-import com.blog.comm.base.BaseLogger;
 import com.blog.comm.base.BaseModel;
 import com.blog.comm.entity.BeanEntity;
 import com.blog.comm.entity.Pager;
@@ -47,7 +48,8 @@ public class JdbcHandle {
 	@Resource
 	private JdbcTemplate jdbcTemplate;
 	
-	BaseLogger logger=BaseLogger.getLogger(this.getClass());
+
+	Logger logger=Logger.getLogger(this.getClass());
 	
 	/**
 	 * 执行SQL查询语句
@@ -60,7 +62,7 @@ public class JdbcHandle {
 	private List<Map<String, Object>> baseQuery(String sql, Object[] paras) {
 		Long threadId = Thread.currentThread().getId();
 		try {
-			logger.info("[线程ID："+threadId+"][执行语句:"+sql+"]"+"[附带参数:"+JSON.toJSONString(paras)+"]");
+			logger.debug("[线程ID："+threadId+"][执行语句:"+parseParams(sql, paras)+"]");
 			return jdbcTemplate.queryForList(sql, paras);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -81,7 +83,7 @@ public class JdbcHandle {
 			final Object...paras) {
 		final Long threadId = Thread.currentThread().getId();
 		try {
-			logger.info("[线程ID："+threadId+"][执行语句:"+sql+"]"+"[附带参数:"+JSON.toJSONString(paras)+"]");
+			logger.debug("[线程ID："+threadId+"][执行语句:"+parseParams(sql, paras)+"]");
 			if (!sql.toLowerCase().trim().startsWith("insert")) {
 				return jdbcTemplate.update(sql, paras);
 			}
@@ -152,6 +154,9 @@ public class JdbcHandle {
 	 * @return
 	 */
 	public Map<String, Object> queryFirst(String sql, Object... paras) {
+		if(!sql.toLowerCase().contains("limit")){
+			sql=sql+" limit 1";
+		}
 		List<Map<String, Object>> list = query(sql, paras);
 		if (StringUtil.isNullOrEmpty(list)) {
 			return null;
@@ -992,4 +997,53 @@ public class JdbcHandle {
 		return sql.toLowerCase();
 	}
 
+	private static String parseParams(String sql,Object... params){
+		sql+=" ";
+		String [] sqlRanks=sql.split("\\?");
+		if(sqlRanks.length==1){
+			return sql;
+		}
+		StringBuilder sb=new StringBuilder();
+		for(int i=0;i<sqlRanks.length;i++){
+			sb.append(sqlRanks[i]);
+			if(i!=sqlRanks.length-1){
+				Object value=params[i];
+				if(!StringUtil.isNullOrEmpty(value)){
+					if(Date.class.isAssignableFrom(value.getClass())){
+					value=dateToString((Date)value);
+					}
+					if(String.class.isAssignableFrom(value.getClass())){
+						value="'"+value+"'";
+					}
+				}
+				sb.append(value);
+			}
+		}
+		return sb.toString();
+	}
+	/**
+	 * 根据时间变量返回时间字符串
+	 * 
+	 * @return 返回时间字符串
+	 * @param pattern
+	 *            时间字符串样式
+	 * @param date
+	 *            时间变量
+	 */
+	public static String dateToString(Date date) {
+		if (date == null) {
+			return null;
+		}
+		try {
+			SimpleDateFormat sfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			return sfDate.format(date);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static void main(String[] args) {
+		String sql="select * from table where uid=? and status=? and createTime>?";
+		System.out.println(parseParams(sql, 1001,1,new Date()));
+	}
 }
