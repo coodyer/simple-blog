@@ -42,6 +42,7 @@ public class DiyDispatcherServlet extends DispatcherServlet implements Filter{
 	
 	public void baseFilter(HttpServletRequest req,HttpServletResponse res){
 		try {
+			loadBasePath(req);
 			res.setContentType("text/html;charset=UTF-8");
 			req.setCharacterEncoding("UTF-8");
 			res.setCharacterEncoding("UTF-8");
@@ -87,7 +88,16 @@ public class DiyDispatcherServlet extends DispatcherServlet implements Filter{
 	public void init(FilterConfig filterConfig) throws ServletException {
 		super.init(new ServletFilter(filterConfig));
 	}
-	
+	private void loadBasePath(HttpServletRequest request) {
+		String path = request.getContextPath();
+		String basePath = request.getScheme()
+				+ "://"
+				+ request.getServerName()
+				+ (request.getServerPort() == 80 ? "" : ":"
+						+ request.getServerPort()) + path + "/";
+		request.getSession().setAttribute("basePath", basePath);
+		request.setAttribute("basePath", basePath);
+	}
 	private static class ServletFilter  implements ServletConfig,FilterConfig{
 
 		private FilterConfig filterConfig;
@@ -95,27 +105,22 @@ public class DiyDispatcherServlet extends DispatcherServlet implements Filter{
 		public ServletFilter(FilterConfig filterConfig){
 			this.filterConfig=filterConfig;
 		}
-		@Override
 		public String getFilterName() {
 			return filterConfig.getFilterName();
 		}
 
-		@Override
 		public String getInitParameter(String s) {
 			return filterConfig.getInitParameter(s);
 		}
 
-		@Override
 		public Enumeration<String> getInitParameterNames() {
 			return filterConfig.getInitParameterNames();
 		}
 
-		@Override
 		public ServletContext getServletContext() {
 			return filterConfig.getServletContext();
 		}
 
-		@Override
 		public String getServletName() {
 			return filterConfig.getFilterName();
 		}

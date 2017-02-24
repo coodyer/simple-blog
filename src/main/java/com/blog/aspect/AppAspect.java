@@ -15,19 +15,28 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.blog.comm.annotation.CacheWipe;
 import com.blog.comm.annotation.CacheWrite;
 import com.blog.comm.annotation.DateSource;
+import com.blog.comm.annotation.Power;
 import com.blog.comm.base.BaseLogger;
 import com.blog.comm.cache.LocalCache;
 import com.blog.comm.entity.MonitorEntity;
+import com.blog.comm.entity.MsgEntity;
 import com.blog.comm.util.AspectUtil;
 import com.blog.comm.util.PrintException;
 import com.blog.comm.util.PropertUtil;
+import com.blog.comm.util.RequestUtil;
 import com.blog.comm.util.SimpleUtil;
+import com.blog.comm.util.SpringContextHelper;
 import com.blog.comm.util.StringUtil;
+import com.blog.model.MemberInfo;
+import com.blog.model.SysMenus;
+import com.blog.service.MenuService;
+import com.blog.service.schema.MenuSchema;
 
 @Aspect
 @Component
@@ -280,7 +289,7 @@ public class AppAspect {
 		}
 	}
 
-/*	@Around("execution(* com.blog..*.*(..)) && @annotation(com.blog.comm.annotation.Power)")
+	@Around("execution(* com.blog..*.*(..)) && @annotation(com.blog.comm.annotation.Power)")
 	public Object bPpowerMonitor(ProceedingJoinPoint pjp) throws Throwable {
 		StopWatch sw = new StopWatch(getClass().getSimpleName());
 		try {
@@ -317,6 +326,9 @@ public class AppAspect {
 				return printPrower(method);
 			}
 			Object result = pjp.proceed();
+			//方法执行完毕，刷新菜单
+			List<MenuSchema> menuSchemas= menuService.parseMenus(menus);
+			RequestUtil.getRequest().setAttribute("menus", menuSchemas);
 			return result;
 		} finally {
 			sw.stop();
@@ -330,7 +342,7 @@ public class AppAspect {
 		}
 		return new MsgEntity(-1, "无权操作");
 	}
-*/
+
 	private static String getJson(Object... args) {
 		if (StringUtil.isNullOrEmpty(args)) {
 			return "";

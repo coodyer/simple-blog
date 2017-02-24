@@ -31,7 +31,7 @@ public class SuffixService {
 		}
 		return PropertUtil.getFieldValues(suffixs, "suffix");
 	}
-	@CacheWrite(key=CacheFinal.SPRING_DEFAULT_SUFFIXS,validTime=3600)
+	@CacheWrite(key=CacheFinal.DEFAULT_SUFFIXS,validTime=3600)
 	public String loadSpringDefaultSuffix(){
 		//执行语句：select * from suffix where status =2 limit 1
 		Suffix suffix=jdbcHandle.findBeanFirst(Suffix.class,"status",2);
@@ -41,7 +41,7 @@ public class SuffixService {
 		return suffix.getSuffix();
 	}
 	
-	@CacheWrite(key=CacheFinal.SITE_STA_SUFFIX_KEY ,validTime=3600)
+	@CacheWrite(key=CacheFinal.STA_SUFFIX ,validTime=3600)
 	public List<String> loadStaSuffix() {
 		//执行语句：select * from suffix_static
 		List<SuffixStatic> suffixs= jdbcHandle.findBean(SuffixStatic.class);

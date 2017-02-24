@@ -5,12 +5,12 @@ public class CacheFinal {
 	/**
 	 * 数据源主从容器
 	 */
-	public static final String JDBC_MASTER_WRAPPER="JDBC_MASTER_WRAPPER";
+	public static final String JDBC_WRAPPER="JDBC_WRAPPER";
 	
 	/**
 	 * 系统定时任务控制
 	 */
-	public static final String SYSTEM_SCHEDULE_WRAPPER="SYSTEM_SCHEDULE_WRAPPER";
+	public static final String TASK_WRAPPER="TASK_WRAPPER";
 	
 	/**
 	 * 日志管理
@@ -24,11 +24,11 @@ public class CacheFinal {
 	/**
 	 * 在线DEBUG容器
 	 */
-	public static final String SIMPLE_LOG_WRAPPER="NEW_"+"SIMPLE_LOG_WRAPPER";
+	public static final String SIMPLE_WRAPPER="SIMPLE_WRAPPER";
 	/**
 	 * 在线DEBUG容器
 	 */
-	public static final String SIMPLE_DEBUG_LOG_WRAPPER="NEW_"+"SIMPLE_DEBUG_LOG_WRAPPER";
+	public static final String LOG_WRAPPER="LOG_WRAPPER";
 	
 	/**
 	 * 网站设置缓存
@@ -51,14 +51,27 @@ public class CacheFinal {
 	/**
 	 * spring默认后缀
 	 */
-	public static final String SPRING_DEFAULT_SUFFIXS="SPRING_DEFAULT_SUFFIXS";
+	public static final String DEFAULT_SUFFIXS="DEFAULT_SUFFIXS";
 	/**
 	 * 网站静态后缀
 	 */
-	public static final String SITE_STA_SUFFIX_KEY="SITE_STA_SUFFIX_KEY";
+	public static final String STA_SUFFIX="STA_SUFFIX";
 	/**
 	 * 域名IP地址
 	 */
 	public static final String SHELL_IP_CACHE="SHELL_IP_CACHE";
+	
+	/**
+	 * 用户权限
+	 */
+	public static final String USER_ROLE_INFO="USER_ROLE_INFO";
+	/**
+	 * 菜单列表
+	 */
+	public static final String MENUS_LIST="MENUS_LIST";
+	/**
+	 * 原始菜单列表
+	 */
+	public static final String MENUS_SOURCES="MENUS_SOURCES";
 	
 }

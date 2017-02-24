@@ -1,13 +1,15 @@
 package com.blog.comm.cache;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.blog.comm.util.StringUtil;
+
 
 /**
  * @className：CacheHandler
@@ -18,8 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version
  */
 public class LocalCache {
-	private static final ConcurrentHashMap<String, Object> map;
+	// private static final long SECOND_TIME = 1000;//默认过期时间 20秒
+	// private static final int DEFUALT_VALIDITY_TIME = 20;//默认过期时间 20秒
 	private static final Timer timer;
+	private static final ConcurrentHashMap<String, Object> map;
+	static Object mutex = new Object();
 	static {
 		timer = new Timer();
 		map = new ConcurrentHashMap<String, Object>();
@@ -35,12 +40,34 @@ public class LocalCache {
 	 */
 	public static  void setCache(String key, Object ce,
 			int validityTime) {
-			map.put(key, ce);
-			timer.schedule(new TimeoutTimerTask(key), validityTime * 1000);
+		map.put(key, new CacheWrapper(validityTime,ce));
+		timer.schedule(new TimeoutTimerTask(key), validityTime * 1000);
 	}
 	//获取缓存KEY列表
 	public static Set<String> getCacheKeys() {
 		return map.keySet();
+	}
+	
+	public static List<String> getKeysFuzz(String patton){
+		List<String> list=new ArrayList<String>();
+		for (String tmpKey : map.keySet()) {
+			if (tmpKey.contains(patton)) {
+				list.add(tmpKey);
+			}
+		}
+		if(StringUtil.isNullOrEmpty(list)){
+			return null;
+		}
+		return list;
+	}
+	public static Integer getKeySizeFuzz(String patton){
+		Integer num=0;
+		for (String tmpKey : map.keySet()) {
+			if (tmpKey.startsWith(patton)) {
+				num++;
+			}
+		}
+		return num;
 	}
 	/**
 	 * 增加缓存对象
@@ -51,7 +78,7 @@ public class LocalCache {
 	 *            有效时间
 	 */
 	public static  void setCache(String key, Object ce) {
-			map.put(key, ce);
+			map.put(key, new CacheWrapper(ce));
 	}
 
 	/**
@@ -60,22 +87,14 @@ public class LocalCache {
 	 * @param key
 	 * @return
 	 */
-	public static Object getCache(String key) {
-		return map.get(key);
-	}
-	public static List<String> getKeysFuzz(String patton){
-		List<String> list=new ArrayList<String>();
-		for (String tmpKey : map.keySet()) {
-			if (tmpKey.contains(patton)) {
-				list.add(tmpKey);
-			}
-		}
-		if(isNullOrEmpty(list)){
+	public static <T> Object getCache(String key) {
+		CacheWrapper wrapper=(CacheWrapper) map.get(key);
+		if(wrapper==null){
 			return null;
 		}
-		return list;
+		return wrapper.getValue();
 	}
-	
+
 	/**
 	 * 检查是否含有制定key的缓冲
 	 * 
@@ -100,9 +119,9 @@ public class LocalCache {
 	 * 
 	 * @param key
 	 */
-	public static void delCacheFuzzy(String key) {
+	public static void delCacheFuzz(String key) {
 		for (String tmpKey : map.keySet()) {
-			if (tmpKey.indexOf(key)>-1) {
+			if (tmpKey.contains(key)) {
 				map.remove(tmpKey);
 			}
 		}
@@ -123,61 +142,52 @@ public class LocalCache {
 	public static void clearCache() {
 		map.clear();
 	}
+
+	/**
+	 * @projName：lottery
+	 * @className：TimeoutTimerTask
+	 * @description：清除超时缓存定时服务类
+	 * @creater：WebSOS
+	 * @creatTime：2014年5月7日上午9:34:39
+	 * @alter：WebSOS
+	 * @alterTime：2014年5月7日 上午9:34:39
+	 * @remark：
+	 * @version
+	 */
 	static class TimeoutTimerTask extends TimerTask {
 		private String ceKey;
 
 		public TimeoutTimerTask(String key) {
 			this.ceKey = key;
 		}
-
 		@Override
 		public void run() {
+			CacheWrapper cacheWrapper=(CacheWrapper) map.get(ceKey);
+			if(cacheWrapper==null||cacheWrapper.getDate()==null){
+				return;
+			}
+			if(new Date().getTime()<cacheWrapper.getDate().getTime()){
+				return;
+			}
 			LocalCache.delCache(ceKey);
 		}
 	}
-	public static boolean isNullOrEmpty(Object obj) {
-		try {
-			if (obj == null)
-				return true;
-			if (obj instanceof CharSequence) {
-				return ((CharSequence) obj).length() == 0;
-			}
-			if (obj instanceof Collection) {
-				return ((Collection<?>) obj).isEmpty();
-			}
-			if (obj instanceof Map) {
-				return ((Map<?,?>) obj).isEmpty();
-			}
-			if (obj instanceof Object[]) {
-				Object[] object = (Object[]) obj;
-				if (object.length == 0) {
-					return true;
-				}
-				boolean empty = true;
-				for (int i = 0; i < object.length; i++) {
-					if (!isNullOrEmpty(object[i])) {
-						empty = false;
-						break;
-					}
-				}
-				return empty;
-			}
-			return false;
-		} catch (Exception e) {
-			return true;
-		}
 
-	}
-	
-	public static void main(String[] args) throws InterruptedException {
-		for (int i = 0; i < 1000000; i++) {
-			LocalCache.setCache(String.valueOf(i), i,5);
+	private static class CacheWrapper{
+		private Date date;
+		private Object value;
+		public CacheWrapper(int time,Object value){
+			this.date=new Date(System.currentTimeMillis()+time*1000);
+			this.value=value;
 		}
-		System.out.println("ok");
-		while (LocalCache.getCacheSize()>0) {
-			System.out.println(LocalCache.getCacheSize());
-			Thread.sleep(1000);
+		public CacheWrapper(Object value){
+			this.value=value;
+		}
+		public Date getDate() {
+			return date;
+		}
+		public Object getValue() {
+			return value;
 		}
 	}
-
 }

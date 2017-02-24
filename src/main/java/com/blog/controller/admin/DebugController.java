@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.blog.comm.annotation.LogHead;
 import com.blog.comm.annotation.Power;
 import com.blog.comm.avafinal.CacheFinal;
 import com.blog.comm.base.BaseController;
 import com.blog.comm.cache.LocalCache;
 import com.blog.comm.entity.BeanEntity;
+import com.blog.comm.entity.CacheEntity;
 import com.blog.comm.entity.CtBeanEntity;
 import com.blog.comm.entity.CtClassEntity;
 import com.blog.comm.entity.CtMethodEntity;
@@ -41,9 +43,10 @@ public class DebugController extends BaseController {
 	private static final String DIR = "admin/debug/";
 
 	@SuppressWarnings("deprecation")
-	@RequestMapping(value = "/admin/debug/fileList.do")
-	@Power("fileSetting")
-	public String fileList(HttpServletRequest req, HttpServletResponse res) {
+	@RequestMapping(value = "/admin/debug/resources")
+	@Power("resources")
+	@LogHead("资源管理")
+	public String resources(HttpServletRequest req, HttpServletResponse res) {
 		String path = getPara("file");
 		if (StringUtil.isNullOrEmpty(path)) {
 			path = Thread.currentThread().getContextClassLoader()
@@ -73,136 +76,9 @@ public class DebugController extends BaseController {
 		setAttribute("parentFile", new File(path).getParent());
 		return DIR + "server_list";
 	}
-
-	@RequestMapping(value = "/admin/debug/fileInfo.do")
-	@Power("fileSetting")
-	public String fileInfo(HttpServletRequest req, HttpServletResponse res) {
-		loadClassEntity();
-		return DIR + "server_info";
-	}
-
-	@RequestMapping(value = "/admin/debug/monitorList.do")
-	@Power("monitorSetting")
-	public String monitorList(HttpServletRequest req, HttpServletResponse res) {
-		/**
-		 * 加载我的监听列表
-		 */
-		List<String> keys = LocalCache.getKeysFuzz(CacheFinal.SYSTEM_RUN_INFO);
-		setAttribute("keys", keys);
-		return DIR + "monitor_list";
-	}
-	@RequestMapping(value = "/admin/debug/modifyField.do")
-	@Power("fileSetting")
-	@ResponseBody
-	public Object modifyField(HttpServletRequest req, HttpServletResponse res) {
-		CtClassEntity clazz=loadClassEntity();
-		String fieldName=getPara("fieldName");
-		String value=getPara("fieldValue");
-		Object bean=null;
-		try {
-			bean = SpringContextHelper.getBean(clazz.getSourceClass());
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		for(CtBeanEntity field:clazz.getFields()){
-			try {
-				System.out.println(field.getFieldName()+":"+fieldName);
-				if(field.getFieldName().equals(fieldName)){
-					Field sourceField=field.getSourceField();
-					sourceField.setAccessible(true);
-					try {
-						Field modifiersField = Field.class.getDeclaredField("modifiers");
-						modifiersField.setAccessible(true);
-						modifiersField.set(sourceField, sourceField.getModifiers() & ~Modifier.FINAL);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if(field.getIsStatic()==true){
-						bean=null;
-					}
-					sourceField.set(bean, PropertUtil.parseValue(value, field.getFieldType()));
-					return new MsgEntity(-1,"操作成功");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				return  new MsgEntity(-1,"修改失败");
-			}
-		}
-		return new MsgEntity(-1,"字段不存在");
-	}
-
-	@SuppressWarnings("deprecation")
-	private CtClassEntity loadClassEntity() {
-		String path = getPara("file");
-		keepParas();
-		if (StringUtil.isNullOrEmpty(path)) {
-			return null;
-		}
-		String basePath = Thread.currentThread().getContextClassLoader()
-				.getResource("").getPath();
-		basePath = new File(basePath).getPath().replace("\\", "/") + "/";
-		basePath=URLDecoder.decode(basePath);
-		path = path.replace("\\", "/");
-		path=URLDecoder.decode(path);
-		if (!path.startsWith(basePath)) {
-			return null;
-		}
-		while (path.contains("../")) {
-			path = path.replace("../", "");
-		}
-		if (!path.endsWith(".class")) {
-			File file = new File(path);
-			if (file.length() < 1048576) {
-				String info = FileUtils.readFile(path);
-				setAttribute("context", info);
-			}
-			return null;
-		}
-		try {
-			String packet = path.replace(basePath, "");
-			packet = packet.replace("/", ".");
-			packet = packet.replace(".class", "");
-			Class<?> clazz = Class.forName(packet);
-			CtClassEntity classInfo = SimpleUtil.getClassEntity(clazz);
-			setAttribute("classInfo", classInfo);
-			return classInfo;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/admin/debug/serverMonitor.do")
-	@Power("monitorSetting")
-	public String serverMonitor(HttpServletRequest req, HttpServletResponse res) {
-		keepParas();
-		String key = getPara("key");
-		Method sourceMethod = SimpleUtil.getMethodByKey(key);
-		CtClassEntity classInfo = SimpleUtil.getClassEntity(PropertUtil
-				.getClass(sourceMethod));
-		CtMethodEntity method = (CtMethodEntity) PropertUtil.getByList(
-				classInfo.getMethods(), "key", key);
-		setAttribute("method", method);
-		setAttribute("isRun", 0);
-		if (LocalCache.contains(key)) {
-			setAttribute("isRun", 1);
-			List<MonitorEntity> monitors = (List<MonitorEntity>) LocalCache
-					.getCache(key);
-			monitors = PropertUtil.doSeqDesc(monitors, "runTime");
-			setAttribute("monitors", monitors);
-		}
-		setAttribute("classInfo", classInfo);
-		/**
-		 * 初始化方法参数
-		 */
-		Object obj = SimpleUtil.initMethodParas(method.getSourceMethod());
-		String initParas = JSON.toJSONString(obj);
-		setAttribute("initParas", initParas);
-		return DIR + "server_monitor";
-	}
-
-	@RequestMapping(value = "/admin/debug/serverDebug.do")
-	@Power("fileSetting")
+	@RequestMapping(value = "/admin/debug/serverDebug")
+	@Power("resources")
+	@LogHead("资源管理-方法调试")
 	public void serverDebug(HttpServletRequest req, HttpServletResponse res) {
 		keepParas();
 		String key = getPara("key");
@@ -280,9 +156,56 @@ public class DebugController extends BaseController {
 			AspectUtil.cleanDebugKey();
 		}
 	}
-
-	@RequestMapping(value = "/admin/debug/serverDoMonitor.do")
-	@Power("fileSetting")
+	@RequestMapping(value = "/admin/debug/resourcesInfo")
+	@Power("resources")
+	@LogHead("资源管理-文件详情")
+	public String resourcesInfo(HttpServletRequest req, HttpServletResponse res) {
+		loadClassEntity();
+		return DIR + "server_info";
+	}
+	@RequestMapping(value = "/admin/debug/modifyField")
+	@Power("resources")
+	@ResponseBody
+	@LogHead("资源管理-字段值修改")
+	public Object modifyField(HttpServletRequest req, HttpServletResponse res) {
+		CtClassEntity clazz=loadClassEntity();
+		String fieldName=getPara("fieldName");
+		String value=getPara("fieldValue");
+		Object bean=null;
+		try {
+			bean = SpringContextHelper.getBean(clazz.getSourceClass());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		for(CtBeanEntity field:clazz.getFields()){
+			try {
+				System.out.println(field.getFieldName()+":"+fieldName);
+				if(field.getFieldName().equals(fieldName)){
+					Field sourceField=field.getSourceField();
+					sourceField.setAccessible(true);
+					try {
+						Field modifiersField = Field.class.getDeclaredField("modifiers");
+						modifiersField.setAccessible(true);
+						modifiersField.set(sourceField, sourceField.getModifiers() & ~Modifier.FINAL);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if(field.getIsStatic()==true){
+						bean=null;
+					}
+					sourceField.set(bean, PropertUtil.parseValue(value, field.getFieldType()));
+					return new MsgEntity(-1,"操作成功");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return  new MsgEntity(-1,"修改失败");
+			}
+		}
+		return new MsgEntity(-1,"字段不存在");
+	}
+	@RequestMapping(value = "/admin/debug/serverDoMonitor")
+	@Power("resources")
+	@LogHead("资源管理-服务监听")
 	public void serverDoMonitor(HttpServletRequest req, HttpServletResponse res) {
 		String key = getPara("key");
 		Integer isRun = getParaInteger("isRun");
@@ -310,16 +233,108 @@ public class DebugController extends BaseController {
 		printMsg(res, new MsgEntity(0, "操作成功"));
 		return;
 	}
+	
+	@RequestMapping(value = "/admin/debug/monitorList")
+	@Power("monitorSetting")
+	public String monitorList(HttpServletRequest req, HttpServletResponse res) {
+		/**
+		 * 加载我的监听列表
+		 */
+		List<String> keys = LocalCache.getKeysFuzz(CacheFinal.SYSTEM_RUN_INFO);
+		setAttribute("keys", keys);
+		return DIR + "monitor_list";
+	}
 
-	@RequestMapping(value = "/admin/debug/cacheSetting.do")
+	@SuppressWarnings("deprecation")
+	private CtClassEntity loadClassEntity() {
+		String path = getPara("file");
+		keepParas();
+		if (StringUtil.isNullOrEmpty(path)) {
+			return null;
+		}
+		String basePath = Thread.currentThread().getContextClassLoader()
+				.getResource("").getPath();
+		basePath = new File(basePath).getPath().replace("\\", "/") + "/";
+		basePath=URLDecoder.decode(basePath);
+		path = path.replace("\\", "/");
+		path=URLDecoder.decode(path);
+		if (!path.startsWith(basePath)) {
+			return null;
+		}
+		while (path.contains("../")) {
+			path = path.replace("../", "");
+		}
+		if (!path.endsWith(".class")) {
+			File file = new File(path);
+			if (file.length() < 1048576) {
+				String info = FileUtils.readFile(path);
+				setAttribute("context", info);
+			}
+			return null;
+		}
+		try {
+			String packet = path.replace(basePath, "");
+			packet = packet.replace("/", ".");
+			packet = packet.replace(".class", "");
+			Class<?> clazz = Class.forName(packet);
+			CtClassEntity classInfo = SimpleUtil.getClassEntity(clazz);
+			setAttribute("classInfo", classInfo);
+			return classInfo;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/admin/debug/serverMonitor")
+	@Power("monitorSetting")
+	public String serverMonitor(HttpServletRequest req, HttpServletResponse res) {
+		keepParas();
+		String key = getPara("key");
+		Method sourceMethod = SimpleUtil.getMethodByKey(key);
+		CtClassEntity classInfo = SimpleUtil.getClassEntity(PropertUtil
+				.getClass(sourceMethod));
+		CtMethodEntity method = (CtMethodEntity) PropertUtil.getByList(
+				classInfo.getMethods(), "key", key);
+		setAttribute("method", method);
+		setAttribute("isRun", 0);
+		if (LocalCache.contains(key)) {
+			setAttribute("isRun", 1);
+			List<MonitorEntity> monitors = (List<MonitorEntity>) LocalCache
+					.getCache(key);
+			monitors = PropertUtil.doSeqDesc(monitors, "runTime");
+			setAttribute("monitors", monitors);
+		}
+		setAttribute("classInfo", classInfo);
+		/**
+		 * 初始化方法参数
+		 */
+		Object obj = SimpleUtil.initMethodParas(method.getSourceMethod());
+		String initParas = JSON.toJSONString(obj);
+		setAttribute("initParas", initParas);
+		return DIR + "server_monitor";
+	}
+
+	
+
+	
+
+	@RequestMapping(value = "/admin/debug/cacheSetting")
 	@Power("cacheSetting")
 	public String cacheSetting(HttpServletRequest req, HttpServletResponse res) {
 		List<CtBeanEntity> entitys = SimpleUtil.getBeanFields(CacheFinal.class);
-		setAttribute("entitys", entitys);
-		return DIR + "cache_list";
+		if(!StringUtil.isNullOrEmpty(entitys)){
+			List<CacheEntity> cacheEntitys=PropertUtil.getNewList(entitys, CacheEntity.class);
+			for(CacheEntity entity:cacheEntitys){
+				entity.setCacheNum(LocalCache.getKeySizeFuzz(entity.getFieldValue().toString()));
+			}
+			cacheEntitys=PropertUtil.doSeqDesc(cacheEntitys, "cacheNum");
+			setAttribute("entitys", cacheEntitys);
+		}
+		return  "/admin/debug/cache_list";
 	}
 
-	@RequestMapping(value = "/admin/debug/cacheClean.do")
+	@RequestMapping(value = "/admin/debug/cacheClean")
 	@Power("cacheSetting")
 	public void cacheClean(HttpServletRequest req, HttpServletResponse res) {
 		String key = getPara("key");
@@ -327,7 +342,7 @@ public class DebugController extends BaseController {
 			printMsg(res, new MsgEntity(-1, "参数有误"));
 			return;
 		}
-		LocalCache.delCacheFuzzy(key);
+		LocalCache.delCacheFuzz(key);
 		printMsg(res, new MsgEntity(0, "操作成功"));
 		return;
 	}

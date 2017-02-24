@@ -18,7 +18,7 @@ public class AdminController extends BaseController {
 	IpService ipService;
 	
 	@RequestMapping(value = "/admin/index")
-	@Power("superIndex")
+	@Power("index")
 	public String superIndex(HttpServletRequest req, HttpServletResponse res) {
 		String ip = ipService.getIp(req.getRequestURL().toString());
 		setAttribute("serverIp", ip);

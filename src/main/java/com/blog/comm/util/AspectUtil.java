@@ -135,7 +135,7 @@ public class AspectUtil {
 	public static String getCurrDBTemplate() {
 		Map<String, Object> record = getCurrRecord();
 		List<String> dbTemplates = (List<String>) record
-				.get(CacheFinal.JDBC_MASTER_WRAPPER);
+				.get(CacheFinal.JDBC_WRAPPER);
 		if (StringUtil.isNullOrEmpty(dbTemplates)) {
 			return null;
 		}
@@ -146,12 +146,12 @@ public class AspectUtil {
 	public static void writeDBTemplate(String dbTemplate) {
 		Map<String, Object> record = getCurrRecord();
 		List<String> dbTemplates = (List<String>) record
-				.get(CacheFinal.JDBC_MASTER_WRAPPER);
+				.get(CacheFinal.JDBC_WRAPPER);
 		if (StringUtil.isNullOrEmpty(dbTemplates)) {
 			dbTemplates = new ArrayList<String>();
 		}
 		dbTemplates.add(dbTemplate);
-		record.put(CacheFinal.JDBC_MASTER_WRAPPER, dbTemplates);
+		record.put(CacheFinal.JDBC_WRAPPER, dbTemplates);
 		moduleThread.set(record);
 	}
 
@@ -159,37 +159,37 @@ public class AspectUtil {
 	public static void minusDBTemplate() {
 		Map<String, Object> record = getCurrRecord();
 		List<String> dbTemplates = (List<String>) record
-				.get(CacheFinal.JDBC_MASTER_WRAPPER);
+				.get(CacheFinal.JDBC_WRAPPER);
 		if (dbTemplates == null) {
 			return;
 		}
 		if (dbTemplates.size() <= 1) {
-			record.put(CacheFinal.JDBC_MASTER_WRAPPER, null);
+			record.put(CacheFinal.JDBC_WRAPPER, null);
 			moduleThread.set(record);
 			return;
 		}
 		dbTemplates.remove(dbTemplates.size() - 1);
-		record.put(CacheFinal.JDBC_MASTER_WRAPPER, dbTemplates);
+		record.put(CacheFinal.JDBC_WRAPPER, dbTemplates);
 		moduleThread.set(record);
 	}
 
 
 	public static void createDebugKey(String method) {
 		Map<String, Object> record = getCurrRecord();
-		record.put(CacheFinal.SIMPLE_LOG_WRAPPER, method);
+		record.put(CacheFinal.SIMPLE_WRAPPER, method);
 		moduleThread.set(record);
 	}
 
 	public static String getDebugKey() {
 		Map<String, Object> record = getCurrRecord();
-		Object method = record.get(CacheFinal.SIMPLE_LOG_WRAPPER);
+		Object method = record.get(CacheFinal.SIMPLE_WRAPPER);
 		return (String) method;
 	}
 
 	public static void cleanDebugKey() {
 		Map<String, Object> record = getCurrRecord();
-		record.remove(CacheFinal.SIMPLE_LOG_WRAPPER);
-		record.remove(CacheFinal.SIMPLE_DEBUG_LOG_WRAPPER);
+		record.remove(CacheFinal.SIMPLE_WRAPPER);
+		record.remove(CacheFinal.LOG_WRAPPER);
 		moduleThread.set(record);
 	}
 }
