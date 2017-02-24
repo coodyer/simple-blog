@@ -33,7 +33,7 @@ public class LocalCache {
 	 * @param validityTime
 	 *            有效时间
 	 */
-	public static synchronized void setCache(String key, Object ce,
+	public static  void setCache(String key, Object ce,
 			int validityTime) {
 			map.put(key, ce);
 			timer.schedule(new TimeoutTimerTask(key), validityTime * 1000);
@@ -50,7 +50,7 @@ public class LocalCache {
 	 * @param validityTime
 	 *            有效时间
 	 */
-	public static synchronized void setCache(String key, Object ce) {
+	public static  void setCache(String key, Object ce) {
 			map.put(key, ce);
 	}
 
