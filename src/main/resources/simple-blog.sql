@@ -3,14 +3,14 @@ Navicat MySQL Data Transfer
 
 Source Server         : blog
 Source Server Version : 50173
-Source Host           : 127.0.0.1:3366
+Source Host           : www.54sb.org:3306
 Source Database       : simple-blog
 
 Target Server Type    : MYSQL
 Target Server Version : 50173
 File Encoding         : 65001
 
-Date: 2017-02-21 14:31:59
+Date: 2017-02-25 11:04:08
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -34,13 +34,12 @@ CREATE TABLE `member_info` (
   `update_time` datetime DEFAULT NULL,
   `balance` double(10,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of member_info
 -- ----------------------------
-INSERT INTO `member_info` VALUES ('1', 'admin', 'fff74ef28fcdc7053ffc969ddb0a9a6b', '13226635321', '系统管理员', null, null, '系统管理员', '1', '1', '2017-01-07 01:01:45', '2017-01-07 01:01:47', null);
-INSERT INTO `member_info` VALUES ('2', 'member', '594a9d81c3495b323d47ffd74b5a5e06', '13226635321', '张先生', '广州易醉网络科技有限公司', '广东省广州市天河区', '商户', '2', '2', '2017-01-07 01:01:45', '2017-01-07 01:01:47', '10000.00');
+INSERT INTO `member_info` VALUES ('1', 'admin', 'd70488316f90e4b3b14f532f197adfa8', '13226635321', '系统管理员', null, null, '系统管理员', '1', '1', '2017-01-07 01:01:45', '2017-01-07 01:01:47', null);
 
 -- ----------------------------
 -- Table structure for member_role
@@ -56,8 +55,7 @@ CREATE TABLE `member_role` (
 -- ----------------------------
 -- Records of member_role
 -- ----------------------------
-INSERT INTO `member_role` VALUES ('1', '系统管理员', '1,2,4,8,10,12,13,14,15,16,17,18,19,29,30,31,32,33,34,35');
-INSERT INTO `member_role` VALUES ('2', '商户', '5,6,7,36,37,38,39,40,41,42,43,44,45,46,47');
+INSERT INTO `member_role` VALUES ('1', '系统管理员', '4,29,30,31,32,28');
 
 -- ----------------------------
 -- Table structure for setting
@@ -207,27 +205,8 @@ CREATE TABLE `sys_menus` (
 -- ----------------------------
 -- Records of sys_menus
 -- ----------------------------
-INSERT INTO `sys_menus` VALUES ('1', '基本设置', '#', '0', null, '1', '', null);
-INSERT INTO `sys_menus` VALUES ('2', '内容管理', '#', '0', null, '2', null, null);
 INSERT INTO `sys_menus` VALUES ('4', '调试中心', '#', '0', null, '3', null, null);
-INSERT INTO `sys_menus` VALUES ('5', '商户中心', '#', '0', null, '4', null, null);
-INSERT INTO `sys_menus` VALUES ('6', '应用中心', '#', '0', null, '5', null, null);
-INSERT INTO `sys_menus` VALUES ('7', '财务中心', '#', '0', null, '6', null, null);
-INSERT INTO `sys_menus` VALUES ('8', '后台首页', '/admin/debug/superIndex.do', '1', '1', '0', 'superIndex', '统计商户/订单/流水类信息');
-INSERT INTO `sys_menus` VALUES ('10', '支付管理', '/admin/pay/payList.do', '1', '1', '2', 'paySetting', '配置支付宝/微信商户号以及秘钥');
-INSERT INTO `sys_menus` VALUES ('16', '商户管理', '/admin/member/memberList.do', '1', '2', '0', 'memberSetting', '对商户信息进行管理和审核');
-INSERT INTO `sys_menus` VALUES ('17', '应用管理', '/admin/app/appList.do', '1', '2', '1', 'appSetting', '对商户应用进行审核');
-INSERT INTO `sys_menus` VALUES ('18', '订单管理', '/admin/order/orderList.do', '1', '2', '3', 'orderSetting', '交易订单管理');
-INSERT INTO `sys_menus` VALUES ('19', '提款管理', '/admin/draw/drawList.do', '1', '2', '4', 'drawSetting', '对商户提款进行管理和审核');
-INSERT INTO `sys_menus` VALUES ('29', '资源管理', '/admin/debug/fileList.do', '1', '4', '1', 'fileSetting', '对项目文件进行管理');
-INSERT INTO `sys_menus` VALUES ('30', '监听管理', '/admin/debug/monitorList.do', '1', '4', '2', 'monitorSetting', '对项目方法进行监听');
-INSERT INTO `sys_menus` VALUES ('31', '任务管理', '/admin/taskSetting.do', '1', '4', '3', 'taskSetting', '对定时任务进行管理');
-INSERT INTO `sys_menus` VALUES ('32', '缓存管理', '/admin/debug/cacheSetting.do', '1', '4', '4', 'cacheSetting', '对系统缓存进行清理');
-INSERT INTO `sys_menus` VALUES ('33', '调试日志', '/admin/debug/logSetting.do', '1', '4', '5', 'logSetting', '对debug阶段的日志进行浏览');
-INSERT INTO `sys_menus` VALUES ('36', '数据统计', '/admin', '1', '5', '0', 'currMemberRunInfoSetting', '商户运营统计');
-INSERT INTO `sys_menus` VALUES ('37', '信息修改', '/admin/member/memberEdit.do', '1', '5', '1', 'memberSetting', '修改商户信息');
-INSERT INTO `sys_menus` VALUES ('38', '账户审核', '/admin/currMemberAuth.do', '1', '5', '2', 'currMemberAuthSetting', '审核信息提交');
-INSERT INTO `sys_menus` VALUES ('42', '应用管理', '/admin/app/appList.do', '1', '6', '0', 'appSetting', '商户应用列表');
-INSERT INTO `sys_menus` VALUES ('43', '交易管理', '/admin/order/orderList.do', '1', '6', '1', 'orderSetting', '商户交易订单管理');
-INSERT INTO `sys_menus` VALUES ('46', '提款管理', '/admin/draw/drawList.do', '1', '7', '0', 'drawSetting', '用户提款管理');
-INSERT INTO `sys_menus` VALUES ('47', '提款设置', '/admin/currMemberDrawInfo.do', '1', '7', '1', 'currMemberDrawInfoSetting', '用户提款账号管理');
+INSERT INTO `sys_menus` VALUES ('28', '运行状态', 'admin/index', '1', '4', '1', 'index', '后台管理首页');
+INSERT INTO `sys_menus` VALUES ('29', '资源管理', 'admin/debug/resources', '1', '4', '1', 'resources', '对项目文件进行管理');
+INSERT INTO `sys_menus` VALUES ('30', '监听管理', 'admin/debug/monitorList', '1', '4', '2', 'monitorSetting', '对项目方法进行监听');
+INSERT INTO `sys_menus` VALUES ('32', '缓存管理', 'admin/debug/cacheSetting', '1', '4', '4', 'cacheSetting', '对系统缓存进行清理');
