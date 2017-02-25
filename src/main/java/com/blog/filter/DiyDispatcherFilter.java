@@ -24,7 +24,7 @@ import com.blog.comm.util.SpringContextHelper;
 import com.blog.service.SuffixService;
 
 @SuppressWarnings("serial")
-public class DiyDispatcherServlet extends DispatcherServlet implements Filter{
+public class DiyDispatcherFilter extends DispatcherServlet implements Filter{
 
 	
 	String [] languages={"ASP.NET","ASP","PHP/5.4.27","JScript","VB.NET","VBScript","CGI","Python","Perl","JAVA","ELanguage"};
@@ -57,7 +57,7 @@ public class DiyDispatcherServlet extends DispatcherServlet implements Filter{
 	}
 	
 	
-	public DiyDispatcherServlet(){
+	public DiyDispatcherFilter(){
 		super();
 	}
 	@Override

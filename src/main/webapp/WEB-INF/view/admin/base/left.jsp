@@ -1,5 +1,9 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="/WEB-INF/tld/c.tld"%>
+<%
+String menuId=request.getParameter("menuId");
+request.setAttribute("menuId", menuId);
+%>
 <!-- 侧边导航栏 -->
 <div class="left-sidebar">
 	<!-- 用户信息 -->
@@ -27,7 +31,8 @@
 			</a>
 				<ul class="sidebar-nav sidebar-nav-sub" style="display: block;">
 					<c:forEach items="${menu.childMenus }" var="chileMenu">
-						<li class="sidebar-nav-link"><a href="${basePath}${chileMenu.url }.${suffix}"> <span
+						<li class="sidebar-nav-link">
+						<a href="${basePath}${chileMenu.url }.${suffix}?menuId=${chileMenu.id}" ${chileMenu.id==menuId?'class=\'active\'':'' }> <span
 								class="am-icon-angle-right sidebar-nav-link-logo"></span> ${chileMenu.title }
 						</a></li>
 					</c:forEach>

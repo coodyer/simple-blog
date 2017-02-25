@@ -40,7 +40,6 @@ import com.blog.comm.util.StringUtil;
 
 @Controller
 public class DebugController extends BaseController {
-	private static final String DIR = "admin/debug/";
 
 	@SuppressWarnings("deprecation")
 	@RequestMapping(value = "/admin/debug/resources")
@@ -59,7 +58,7 @@ public class DebugController extends BaseController {
 		basePath=URLDecoder.decode(basePath);
 		path=URLDecoder.decode(path);
 		if (!path.startsWith(basePath)) {
-			return DIR + "server_list";
+			return  "/admin/debug/server_list";
 		}
 		File[] files = new File(path).listFiles();
 		List<WsFileEntity> fileEntitys = FileUtils.parseWsFile(files);
@@ -74,7 +73,8 @@ public class DebugController extends BaseController {
 		System.out.println(currFile);
 		setAttribute("currFile", currFile);
 		setAttribute("parentFile", new File(path).getParent());
-		return DIR + "server_list";
+		keepParas();
+		return "admin/debug/resources";
 	}
 	@RequestMapping(value = "/admin/debug/serverDebug")
 	@Power("resources")
@@ -161,7 +161,7 @@ public class DebugController extends BaseController {
 	@LogHead("资源管理-文件详情")
 	public String resourcesInfo(HttpServletRequest req, HttpServletResponse res) {
 		loadClassEntity();
-		return DIR + "server_info";
+		return  "/admin/debug/resources_info";
 	}
 	@RequestMapping(value = "/admin/debug/modifyField")
 	@Power("resources")
@@ -242,7 +242,7 @@ public class DebugController extends BaseController {
 		 */
 		List<String> keys = LocalCache.getKeysFuzz(CacheFinal.SYSTEM_RUN_INFO);
 		setAttribute("keys", keys);
-		return DIR + "monitor_list";
+		return  "/admin/debug/monitor_list";
 	}
 
 	@SuppressWarnings("deprecation")
@@ -312,7 +312,7 @@ public class DebugController extends BaseController {
 		Object obj = SimpleUtil.initMethodParas(method.getSourceMethod());
 		String initParas = JSON.toJSONString(obj);
 		setAttribute("initParas", initParas);
-		return DIR + "server_monitor";
+		return "/admin/debug/server_monitor";
 	}
 
 	

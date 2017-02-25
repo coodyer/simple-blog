@@ -28,7 +28,7 @@
 	</filter-mapping>
 	<filter>
 		<filter-name>SpringMVC</filter-name>
-		<filter-class>com.blog.filter.DiyDispatcherServlet</filter-class>
+		<filter-class>com.blog.filter.DiyDispatcherFilter</filter-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
 			<param-value>classpath:applicationContext.xml</param-value>

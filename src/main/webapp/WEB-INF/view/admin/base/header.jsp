@@ -12,20 +12,12 @@
 				<div class="am-fl tpl-header-switch-button am-icon-list">
 					<span> </span>
 				</div>
-				<!-- 搜索 -->
-				<div class="am-fl tpl-header-search">
-					<form class="tpl-header-search-form" action="javascript:;">
-						<button class="tpl-header-search-btn am-icon-search"></button>
-						<input class="tpl-header-search-box" type="text"
-							placeholder="搜索内容...">
-					</form>
-				</div>
 				<!-- 其它功能-->
 				<div class="am-fr tpl-header-navbar">
 					<ul>
 						<!-- 欢迎语 -->
 						<li class="am-text-sm tpl-header-navbar-welcome"><a
-							href="javascript:;">欢迎你, <span>Amaze UI</span>
+							href="javascript:;">欢迎你, <span>${curr_login_user.userName }</span>
 						</a></li>
 
 						<!-- 新邮件 -->

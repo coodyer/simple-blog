@@ -16,21 +16,19 @@
 		<jsp:include page="base/left.jsp" />
 		<!-- 内容区域 -->
 		<div class="tpl-content-wrapper">
-			<div class="container-fluid am-cf">
-				<div class="row">
-					<div class="am-u-sm-12 am-u-md-12 am-u-lg-9">
-						<div class="page-header-heading">
-							<span class="am-icon-home page-header-heading-icon"></span> 后台首页
-							<small>simple-blog</small>
-						</div>
-						<p class="page-header-description">服务器基本运行状态。</p>
-					</div>
-				</div>
-			</div>
 			<div class="row-content am-cf">
 				<div class="row">
 					<div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
 						<div class="widget am-cf">
+							<div class="widget-head am-cf">
+								<div class="am-u-sm-12 am-u-md-12 am-u-lg-9">
+									<div class="page-header-heading">
+										<span class="am-icon-home page-header-heading-icon"></span>
+										后台首页 <small>simple-blog</small>
+									</div>
+									<p class="page-header-description">服务器基本运行状态。</p>
+								</div>
+							</div>
 							<div class="widget-body  widget-body-lg am-fr">
 								<table width="100%"
 									class="am-table am-table-compact am-table-striped tpl-table-black am-table-bordered"

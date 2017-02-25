@@ -90,12 +90,12 @@ $("#loginForm").Validform({
 					url : 'doLogin.${suffix}',
 					timeout : 60000,
 					success : function(json) {
-						alert(json.msg);
-						if(json.code==0){
-							location.href="index.${suffix}";
+						if(json.code!=0){
+							alert(json.msg);
+							loadCode();
 							return;
 						}
-						loadCode();
+						location.href="index.${suffix}";
 					},
 					error : function() {
 						loadCode();

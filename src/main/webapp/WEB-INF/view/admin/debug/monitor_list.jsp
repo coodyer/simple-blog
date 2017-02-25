@@ -21,48 +21,42 @@
 					<div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
 						<div class="widget am-cf">
 							<div class="widget-head am-cf">
-								<div class="widget-title  am-cf">缓存列表</div>
+								<div class="widget-title  am-cf">监听列表</div>
 							</div>
 							<div class="widget-body  am-fr">
-								<div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-									<div
-										class="am-input-group am-input-group-sm tpl-form-border-form cl-p">
-										<input type="text" class="am-form-field" placeholder="请输入缓存KEY" id="cacheKey"> <span
-											class="am-input-group-btn">
-											<button
-												class="am-btn  am-btn-default am-btn-success tpl-table-list-field am-icon-trash"
-												type="button" onclick="delCacheTrigger()">清理缓存</button>
-										</span>
-									</div>
-								</div>
 								<div class="widget-head am-cf">
-								<div class="widget-title  am-cf"></div>
-							</div>
+									<div class="widget-title  am-cf"></div>
+								</div>
 								<div class="am-u-sm-12">
 									<table width="100%"
 										class="am-table am-table-compact am-table-striped tpl-table-black "
 										id="example-r">
 										<thead>
 											<tr>
-												<th>KEY</th>
-												<th>数目</th>
+												<th>方法</th>
 												<th>操作</th>
 											</tr>
 										</thead>
 										<tbody>
-										<c:forEach items="${entitys }" var="entity">
-											<tr class="even gradeC">
-												<td>${entity.fieldValue }</td>
-												<td>${entity.cacheNum }</td>
-												<td>
-													<div class="tpl-table-black-operation">
-														<a href="javascript:delCache('${entity.fieldValue }')"
-															class="tpl-table-black-operation"> <i
-															class="am-icon-trash"></i> 清理缓存
-														</a>
-													</div>
-												</td>
-											</tr>
+										<c:if test="${empty keys }">
+										<tr class="even gradeC"><td colspan="2"><center>暂无数据</center></td></tr>
+										</c:if>
+											<c:forEach items="${keys }" var="key">
+												<tr class="even gradeC">
+													<td>${key}</td>
+													<td>
+														<div class="tpl-table-black-operation">
+															<a href="serverMonitor.${suffix }?key=${key }"
+																class=""> <i
+																class="am-icon-archive"></i> 查看详情
+															</a>
+															<a href="javascript:cancelMonitor('${key }')"
+																class=""> <i
+																class="am-icon-trash"></i> 取消监听
+															</a>
+														</div>
+													</td>
+												</tr>
 											</c:forEach>
 											<!-- more data -->
 										</tbody>
@@ -80,29 +74,24 @@
 	<script src="../assets/js/dataTables.responsive.min.js"></script>
 	<script src="../assets/js/app.js"></script>
 	<script>
-	function delCache(key) {
-		if (!confirm("该KEY所有缓存都将清理,是否继续?")) {
-			return;
+		function cancelMonitor(key) {
+			$.ajax({
+				type : "POST",
+				dataType : 'json',
+				data : "isRun=0&key=" + key,
+				url : 'serverDoMonitor.${suffix}',
+				timeout : 60000,
+				success : function(json) {
+					alert(json.msg);
+					if (json.code == 0) {
+						location.reload(true);
+					}
+				},
+				error : function() {
+					alert("系统繁忙");
+				}
+			});
 		}
-		$.ajax({
-			type : "POST",
-			dataType : 'json',
-			data : 'key=' + key,
-			url : 'cacheClean.${suffix}',
-			timeout : 60000,
-			success : function(json) {
-				alert(json.msg);
-			},
-			error : function() {
-				alert("系统繁忙");
-			}
-
-		});
-	}
-	function delCacheTrigger() {
-		var key=$("#cacheKey").val();
-		delCache(key);
-	}
 	</script>
 </body>
 <style>

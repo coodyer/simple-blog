@@ -311,7 +311,7 @@ public class AppAspect {
 			MemberInfo currMember = RequestUtil.getUser(RequestUtil
 					.getRequest());
 			if (currMember == null) {
-				return printPrower(method);
+				return printTimeOut(method);
 			}
 			// 获得当前用户菜单权限
 			MenuService menuService = SpringContextHelper
@@ -335,6 +335,13 @@ public class AppAspect {
 		}
 	}
 
+	private static Object printTimeOut(Method method) {
+		ResponseBody responseBody = method.getAnnotation(ResponseBody.class);
+		if (responseBody == null) {
+			return "redirect:"+RequestUtil.getRequest().getAttribute("basePath")+"admin/login."+RequestUtil.getRequest().getAttribute("suffix");
+		}
+		return new MsgEntity(-1, "登录超时");
+	}
 	private static Object printPrower(Method method) {
 		ResponseBody responseBody = method.getAnnotation(ResponseBody.class);
 		if (responseBody == null) {
