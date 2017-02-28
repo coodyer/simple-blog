@@ -181,8 +181,8 @@ public class JdbcHandle {
 	 * @param paras 参数列表
 	 * @return
 	 */
-	public <T> T queryFirstAuto(Class<?> clazz,String sql, Object... paras) {
-		List<T> list=queryAuto(clazz, sql, paras);
+	public <T> T queryAuto(Class<?> clazz,String sql, Object... paras) {
+		List<T> list=queryAutos(clazz, sql, paras);
 		if(StringUtil.isNullOrEmpty(list)){
 			return null;
 		}
@@ -196,7 +196,7 @@ public class JdbcHandle {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
-	public <T> List<T> queryAuto(Class<?> clazz,String sql, Object... paras) {
+	public <T> List<T> queryAutos(Class<?> clazz,String sql, Object... paras) {
 		List<Map<String, Object>> records = query(sql, paras);
 		if (StringUtil.isNullOrEmpty(records)) {
 			return null;
@@ -667,7 +667,7 @@ public class JdbcHandle {
 	 */
 	public Integer getCount(String sql, Object...params) {
 		sql = parsCountSql(sql);
-		Integer count = queryFirstAuto(Integer.class,sql, params);
+		Integer count = queryAuto(Integer.class,sql, params);
 		return count;
 	}
 
