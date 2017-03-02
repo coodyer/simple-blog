@@ -741,25 +741,51 @@ public class PropertUtil {
 				return value;
 			}
 			if (Date.class.isAssignableFrom(clazz)) {
-				if (Date.class.isAssignableFrom(value.getClass())) {
-					return value;
+				if(Timestamp.class.isAssignableFrom(value.getClass())){
+					return new Date(((Timestamp)value).getTime());
 				}
 				if(java.sql.Date.class.isAssignableFrom(value.getClass())){
 					return new Date(((java.sql.Date)value).getTime());
 				}
-				if(Timestamp.class.isAssignableFrom(value.getClass())){
-					return new Date(((Timestamp)value).getTime());
+				if (Date.class.isAssignableFrom(value.getClass())) {
+					return value;
+				}
+				if (StringUtil.isMatcher(value.toString(),
+						"\\d{13}")) {
+					value =new Date(Long.valueOf(value
+							.toString()));
+					return value;
+				}
+				if (StringUtil.isMatcher(value.toString(),
+						"\\d{8}")) {
+					value = new SimpleDateFormat("yyyyMMdd").parse(value
+							.toString());
+					return value;
+				}
+				if (StringUtil.isMatcher(value.toString(),
+						"\\d{14}")) {
+					value = new SimpleDateFormat("yyyyMMddHHmmss").parse(value
+							.toString());
+					return value;
+				}
+				if (StringUtil.isMatcher(value.toString(),
+						"\\d{17}")) {
+					value = new SimpleDateFormat("yyyyMMddHHmmssSSS").parse(value
+							.toString());
+					return value;
 				}
 				if (StringUtil.isMatcher(value.toString(),
 						"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}")) {
 					value = new SimpleDateFormat("yyyy-MM-dd").parse(value
 							.toString());
+					return value;
 				}
 				if (StringUtil
 						.isMatcher(value.toString(),
 								"^\\d{4}\\D+\\d{1,2}\\D+\\d{1,2}\\D+\\d{1,2}\\D+\\d{1,2}\\D+\\d{1,2}\\D*")) {
 					value = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 							.parse(value.toString());
+					return value;
 				}
 				return value;
 			}
@@ -768,5 +794,10 @@ public class PropertUtil {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static void main(String[] args) {
+		String str="20150228172564999";
+		System.out.println(parseValue(str, Date.class));
 	}
 }
