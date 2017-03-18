@@ -59,7 +59,7 @@ public class JdbcHandle {
 	 *            参数map容器
 	 * @return 结果集
 	 */
-	private List<Map<String, Object>> baseQuery(String sql, Object[] paras) {
+	private List<Map<String, Object>> baseQuery(String sql, Object... paras) {
 		Long threadId = Thread.currentThread().getId();
 		try {
 			logger.debug("[线程ID："+threadId+"][执行语句:"+parseParams(sql, paras)+"]");
@@ -144,7 +144,7 @@ public class JdbcHandle {
 	 * @return
 	 */
 	public List<Map<String, Object>> query(String sql) {
-		return baseQuery(sql, null);
+		return baseQuery(sql, new Object[]{});
 	}
 
 	/**
