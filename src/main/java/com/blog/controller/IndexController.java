@@ -17,7 +17,7 @@ public class IndexController extends BaseController{
 	@Resource
 	SettingService settingService;
 	
-	@RequestMapping("index.do")
+	@RequestMapping("index")
 	public String index(HttpServletResponse res){
 		Setting setting=settingService.loadSiteSetting();
 		setAttribute("setting", setting);
